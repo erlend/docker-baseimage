@@ -1,11 +1,10 @@
 FROM alpine:3.4
 
-RUN echo "@edge http://dl-4.alpinelinux.org/alpine/edge/community" \
-      >> /etc/apk/repositories && \
-    apk add -U su-exec runit@edge && \
-    rm -rf /var/cache/apk/* && \
-    mkdir -p /etc/service /etc/my_init.d /etc/runit
+RUN apk add -U su-exec dcron && \
+    apk add -UX http://dl-4.alpinelinux.org/alpine/edge/community runit && \
+    mkdir -p /etc/service /etc/startup && \
+    rm -rf /tmp/* /var/tmp/* /var/cache/apk/*
 
-COPY docker-entrypoint.sh /
+COPY . /
 
 ENTRYPOINT ["/docker-entrypoint.sh"]

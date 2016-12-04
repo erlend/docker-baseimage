@@ -1,22 +1,15 @@
 #!/bin/sh
 
-env > /etc/envvars
+rm -f /etc/env
+for varname in `env | grep -o "^[A-Z_0-9]*"`; do
+  echo "$varname=\"`printenv $varname`\"" >> /etc/env
+done
 
 if [ $# -eq 0 ]; then
-  echo "Starting pre-service scritps in /etc/my_init.d"
-  for script in /etc/my_init.d/*; do
-    if [ -x "$script" ]; then
-      echo >&2 "*** Running: $script"
-      $script
-      retval=$?
-      if [ $retval != 0 ]; then
-        echo >&2 "*** Failed with return value: $?"
-        exit $retval
-      fi
-    fi
-  done
+  echo "Starting pre-service scripts in /etc/startup"
+  run-parts /etc/startup
 
-  exec /sbin/runsvdir -P /etc/service
+  set -- /sbin/runsvdir -P /etc/service
 fi
 
 exec $@
